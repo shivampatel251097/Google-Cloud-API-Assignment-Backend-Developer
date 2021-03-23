@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>File Upload Functionality</title>
+</head>
+<body>
+<div class="container">
+    <h2>Multiple File Merger</h2>
+    <h4>Select two files to merge and fill respective  values in the Table:</h4>
+    <label for="file1">Select file1:</label>
+    <input type="file" id="file1" name="file1"accept=".xls, .xlsx ,.csv" onchange="sendDataAndDataTabel(event)"><br>
+    <label for="file2">Select file2:</label>
+    <input type="file" id="file2" name="file2" accept=".xls, .xlsx ,.csv" onchange="sendDataAndDataTabel(event)"><br><br>
+    <!-- <button class="btn btn-primary" onclick="sendDataAndDataTabel(event)">Submit</button> -->
+
+    <p>Merged Rows of both the follows are as follows:</p>
+
+    <table id="DataTable" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th title="Order Number">Order Number</th>
+            <th title="Profit/loss(%)">Profit/loss(%)</th>
+            <th title="Transferred Account">Transferred Account</th>
+            <th title="Total Marketplace Charges">Total Marketplace Charges</th>
+        </tr>
+        </thead>
+        <tbody id="TableBody">
+
+        </tbody>
+    </table>
+</div>
+</body>
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+ <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+ <script>
+
+ function sendDataAndDataTabel(event){
+    var selectedFile = event.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e){
+        var content = e.target.result;
+        // var data = csvJSON(content);
+        console.log(content);
+        makeTable(csvJSON(content));
+    }
+    reader.readAsText(selectedFile);
+}
+
+function csvJSON(csv){
+var lines=csv.split("\n");
+
+var result = [];
+var headers=lines[0].split(",");
+
+for(var i=1;i<lines.length;i++){
+    var obj = {};
+    var currentline=lines[i].split(",");
+
+    for(var j=0;j<headers.length;j++){
+        obj[headers[j]] = currentline[j];
+    }
+    result.push(obj);
+
+}
+// return JSON.stringify(result); //return JSON object
+return result;
+}
+
+function makeTable(myArr){
+    var tableBody=document.getElementById("TableBody");
+    console.log(myArr[0]);
+    for(var i=0;i<myArr.length-1;i++){
+        //1st col
+        var tr= document.createElement("tr");
+        var td = document.createElement("td");
+        td.innerHTML = myArr[i].OrderNum;
+        tr.appendChild(td);
+
+        //2nd col
+        var td = document.createElement("td");
+        td.innerHTML = ((+myArr[i]["Sale Amount"] - +myArr[i]["Cost Price"])*100)/+myArr[i]["Cost Price"];
+        tr.appendChild(td);
+
+        //3rd col
+        var td = document.createElement("td");
+        td.innerHTML = myArr[i]["Transferred Amount"];
+        tr.appendChild(td);
+
+        //4th col
+        var td = document.createElement("td");
+        td.innerHTML = +(myArr[i].Commission) + +(myArr[i]["Payment Gateway"]) + +(myArr[i]["PickPack Fee\r"]);
+        tr.appendChild(td);
+
+        //appending the row to table body
+        tableBody.appendChild(tr);
+    }
+
+
+}
+</script>
+</html>
